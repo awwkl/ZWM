@@ -12,7 +12,7 @@ Code for the paper "Zero-shot World Models Are Developmentally Efficient Learner
 
 
 ## Progress Update
-We will release the code by May 2026, to enable readers to reproduce our results. The datasets used for training our BabyZWM model will also be made available.
+We will release code by end-April 2026. The datasets used for training our BabyZWM model will also be made available.
 
 ## Citation
 
