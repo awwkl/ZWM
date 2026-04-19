@@ -1,0 +1,31 @@
+# Downloaded checkpoints and training output
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# No need to track these
+tmp/
+personal_scripts/
+viz/
+.gradio/
+wandb/
+*.pt
