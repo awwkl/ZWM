@@ -7,13 +7,14 @@
 #
 # Output:
 #   viz/zwm_factual_predictions/<MODEL_NAME>/iter_*.png
-#     Each PNG is a 7-panel figure: frame0, frame1 (ground truth), prediction,
-#     prediction (unmasked), frame1 with mask, frame0 raw, frame1 raw.
+#     Each PNG is a 5-panel figure: frame0, frame1 (ground truth),
+#     predicted patches, predicted plus unmasked patches, frame1 GT with mask.
 #   viz/zwm_factual_predictions/<MODEL_NAME>/loss_value.txt
 #     Mean MSE between the predicted and ground-truth frame1.
 #
-# Expected run time: ~1–2 minutes on a single NVIDIA A100 (after one-time
-# checkpoint download from HuggingFace, ~30s for the 170M model).
+# Expected run time: ~2 minutes for 10 samples on a single NVIDIA A40 (similar
+# on other modern NVIDIA GPUs, e.g. RTX 30/40 series), plus a one-time HF
+# checkpoint download (~30 s for the 170M model).
 
 set -euo pipefail
 

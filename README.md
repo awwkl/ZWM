@@ -45,7 +45,7 @@ Verify the install:
 python -c "from zwm.zwm_predictor import ZWMPredictor; print('ok')"
 ```
 
-Typical install time on a workstation with a fast network: ~5–10 minutes (dominated by the PyTorch / CUDA wheel download).
+Typical install time on a normal desktop workstation with a fast network: ~5–10 minutes, dominated by the PyTorch + CUDA wheel download (~3 GB). On a slower (~10 Mbps) home connection, expect closer to 30–45 minutes.
 
 ## Model zoo
 
@@ -126,9 +126,9 @@ python -m zwm.inv.inv_zwm_factual_prediction \
 
 The wrapper script also auto-downloads the HuggingFace checkpoint into `out/` on first run. With only 3 bundled clips, the script cycles over them with replacement; each sample uses a randomly chosen frame pair (gap in [5, 16) frames) so 10 samples surface a range of gap sizes. To run on your own data, point `--videos_dir` at any directory of `.mp4` files (recursively globbed).
 
-**Expected output:** Saves a 7-panel visualization for each sampled frame pair to `viz/zwm_factual_predictions/<model_name>/iter_*.png` (panels: frame 0, frame 1 ground truth, prediction, prediction unmasked, frame 1 with mask, frame 0 raw, frame 1 raw), plus `loss_value.txt` with the mean MSE between predicted and ground-truth frame 1.
+**Expected output:** Saves a 5-panel visualization for each sampled frame pair to `viz/zwm_factual_predictions/<model_name>/iter_*.png` (panels: frame 0, frame 1 ground truth, predicted patches, predicted plus unmasked patches, frame 1 GT with mask), plus `loss_value.txt` with the mean MSE between predicted and ground-truth frame 1.
 
-**Expected run time:** ~2 minutes for 10 samples on a single NVIDIA A40, plus a one-time HuggingFace checkpoint download on first run (~30 s for the 170M model).
+**Expected run time:** ~2 minutes for 10 samples on a single NVIDIA A40 (similar on other modern NVIDIA GPUs with bfloat16 support, e.g. RTX 30/40-series consumer GPUs typical of a desktop workstation), plus a one-time HuggingFace checkpoint download on first run (~30 s for the 170M model). CPU-only execution is not supported.
 
 ## Interactive Gradio demo
 
