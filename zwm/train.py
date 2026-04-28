@@ -987,7 +987,8 @@ def main(args):
                                         'args': args,
                                         'wandb_id': wandb.run.id if args.wandb else None
                                     },
-                                    os.path.join(out_dir, f"model_{it // gradient_accumulation_steps:08}.pt")
+                                    os.path.join(out_dir, f"model_{it // gradient_accumulation_steps:08}.pt"),
+                                    gcloud=args.save_to_gcloud,
                                 )
 
                         elif not args.fsdp and master_process:
@@ -996,14 +997,15 @@ def main(args):
                             raw_state = {k: v.cpu().float() for k, v in raw_model.state_dict().items()}
                             raw_model.save(
                                 {
-                                    'weights': raw_state, 
+                                    'weights': raw_state,
                                     # 'optimizer': optimizer.state_dict(),
                                     'iteration': it // gradient_accumulation_steps,
                                     'cfg': cfg_to_dict(cfg),
                                     'args': args,
                                     'wandb_id': wandb.run.id if args.wandb else None
                                 },
-                                os.path.join(out_dir, f"model_{it // gradient_accumulation_steps:08}.pt")
+                                os.path.join(out_dir, f"model_{it // gradient_accumulation_steps:08}.pt"),
+                                gcloud=args.save_to_gcloud,
                             )
 
                         # Move the model back to the device
