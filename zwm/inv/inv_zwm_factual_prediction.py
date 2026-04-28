@@ -50,13 +50,13 @@ def generate_factual_predictions(args):
     zwm_predictor = ZWMPredictor(model_name=args.model_name)
     
     video_files = glob.glob(os.path.join(args.videos_dir, '**/*.mp4'), recursive=True)
+    assert len(video_files) > 0, f"No .mp4 files found in {args.videos_dir}"
     random.shuffle(video_files)
-    
+
     losses = []
-    for i, video_file in enumerate(tqdm(video_files, total=args.n_samples_to_eval)):
-        if i >= args.n_samples_to_eval:
-            break
-        
+    for i in tqdm(range(args.n_samples_to_eval)):
+        video_file = video_files[i % len(video_files)]
+
         try:
             video_name = os.path.basename(video_file)
             
@@ -72,8 +72,9 @@ def generate_factual_predictions(args):
             frame0_np, frame1_np = frames_batch[0], frames_batch[1]
             
             frame0, frame1 = Image.fromarray(frame0_np), Image.fromarray(frame1_np)
-            results = zwm_predictor.factual_prediction(frame0, frame1, frame_gap=frame_gap, 
-                                                       mask_ratio=args.frame1_mask_ratio)
+            results = zwm_predictor.factual_prediction(frame0, frame1, frame_gap=frame_gap,
+                                                       mask_ratio=args.frame1_mask_ratio,
+                                                       seed=i)
             
             if i < args.num_viz:
                 fig, ax = plt.subplots(1, 7, figsize=(20, 5))
