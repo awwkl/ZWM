@@ -77,7 +77,7 @@ def generate_factual_predictions(args):
                                                        seed=i)
             
             if i < args.num_viz:
-                fig, ax = plt.subplots(1, 7, figsize=(20, 5))
+                fig, ax = plt.subplots(1, 5, figsize=(15, 5))
                 for axis in ax:
                     axis.title.set_fontsize(35)
                 ax[0].imshow(results['frame0_pil'])
@@ -85,15 +85,11 @@ def generate_factual_predictions(args):
                 ax[1].imshow(results['frame1_pil'])
                 ax[1].set_title("Frame 1 GT")
                 ax[2].imshow(results['frame1_pred_pil'])
-                ax[2].set_title("Prediction")
+                ax[2].set_title("Predicted patches")
                 ax[3].imshow(results['frame1_pred_pil_unmasked'])
-                ax[3].set_title("Prediction Unmasked")
+                ax[3].set_title("Predicted plus unmasked patches")
                 ax[4].imshow(results['frame1_with_mask_pil'])
                 ax[4].set_title("Frame 1 GT with Mask")
-                ax[5].imshow(results['frame0_pred_raw_PIL'])
-                ax[5].set_title("Frame 0 Pred Raw")
-                ax[6].imshow(results['frame1_pred_raw_PIL'])
-                ax[6].set_title("Frame 1 Pred Raw")
 
                 img = fig_to_img(fig)
                 img_viz_path = os.path.join(args.out_viz_dir, f'iter_{i}_{video_name}_idx_{ridx0}_{ridx1}.png')
