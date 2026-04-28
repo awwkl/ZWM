@@ -6,7 +6,10 @@
 
 export SEED=$(date +%s)
 
-python -m zwm.train \
+torchrun \
+    --nnodes=1 \
+    --nproc_per_node=1 \
+    -m zwm.train \
     --run_name zwm_smoketest \
     --model_config zwm.config.ZWM_170MConfig \
     --train_data_dir data/demo_videos/ \

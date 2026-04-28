@@ -8,7 +8,7 @@ export SEED=$(date +%s)
 torchrun \
     --nnodes=1 \
     --nproc_per_node=8 \
-    zwm/train.py \
+    -m zwm.train \
     --run_name zwm-babyview-1b \
     --model_config zwm.config.ZWM_1BConfig \
     --train_data_dir /path/to/babyview/clips/ \
@@ -28,6 +28,3 @@ torchrun \
     --dtype bfloat16 \
     --seed $SEED \
     --compile \
-    # --resume_from "zwm-babyview-1b/model_00020000.pt" \
-    # --resume_optimizer \
-    # --fsdp \
