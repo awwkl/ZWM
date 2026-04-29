@@ -16,6 +16,14 @@ Code for the paper "Zero-shot World Models Are Developmentally Efficient Learner
 
 Today's best AI needs orders of magnitude more data than a human child to achieve visual competence. We introduce the Zero-shot World Model (ZWM), an approach that substantially narrows this gap. Even when trained on a single child's visual experience, BabyZWM matches state-of-the-art models on diverse visual-cognitive tasks – with no task-specific training, i.e., zero-shot. Our work presents a blueprint for efficient and flexible learning from human-scale data, advancing a path toward data-efficient AI systems.
 
+## How it works
+
+ZWM has three key principles:
+
+1. ZWM starts with a masked autoencoder trained with sparse "temporally-factored" masking, creating a predictor that flexibly separates visual appearance from underlying dynamics.
+2. The core of ZWM is the idea of *zero-shot prompting* the predictor via "approximate causal inference": perturb the input, make a prediction, then compare against unperturbed inputs/predictions. E.g., to segment an object, simply predict what happens if we move one patch of it, then compare it against the unperturbed input to see which pixels moved together.
+3. Compositions of prompts allow the extraction of interpretable and increasingly abstract visual structures, building a computational graph of visual abstractions.
+
 ## System requirements
 
 - **OS**: Linux (tested on Ubuntu 20.04, kernel 5.4). Should also work on other Linux distributions; not tested on macOS or Windows.
@@ -47,6 +55,27 @@ python -c "from zwm.zwm_predictor import ZWMPredictor; print('ok')"
 
 Typical install time on a normal desktop workstation with a fast network: ~5–10 minutes, dominated by the PyTorch + CUDA wheel download (~3 GB). On a slower (~10 Mbps) home connection, expect closer to 30–45 minutes.
 
+## Repository layout
+
+```
+ZWM/
+├── zwm/                  # Python package: model, training, inference
+│   ├── train.py          #   entry point for training
+│   ├── zwm_predictor.py  #   ZWMPredictor — factual + hypothetical inference API
+│   ├── inv/              #   batched-inference scripts (e.g. factual prediction)
+│   ├── data/             #   dataset + patch-sequence loaders
+│   ├── utils/            #   model wrapper, sequence construction, viz helpers
+│   └── config.py         #   ZWM_170MConfig, ZWM_1BConfig
+├── scripts/              # Training replication recipes + HF download utilities
+├── demos/                # Reviewer-facing demos (Gradio, inference, smoke test)
+├── data/demo_videos/     # Bundled CC-BY clips for the inference demo
+├── out/                  # Model checkpoints (downloaded or trained)
+├── viz/                  # Inference visualization outputs
+├── requirements.txt      # Pinned dependencies
+├── SOFTWARE.md           # Software policy / version manifest
+└── LICENSE               # MIT
+```
+
 ## Model zoo
 
 | HF repo | Training data | Params | Resolution |
@@ -62,6 +91,8 @@ Download a checkpoint into `./out/`:
 ```bash
 python scripts/hf_model_download.py awwkl/zwm-bvd-170m
 ```
+
+This places the file at `out/awwkl/zwm-bvd-170m/model.pt`. Throughout the rest of the README, `ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")` and equivalent `--model_name` arguments refer to this relative path under `out/` — not a HuggingFace ID directly.
 
 ## Quickstart — Hypothetical prediction
 
@@ -90,7 +121,36 @@ out["frame1_pred_pil"].save("hypothetical.png")
 
 ## Quickstart — Factual prediction
 
-Reconstruct masked patches in `frame1` given `frame0` and a few visible hints:
+Reconstruct masked patches in `frame1` given `frame0` and a few visible hints. The repo bundles three short CC-BY 3.0 clips in [data/demo_videos/](data/demo_videos/) (excerpts of Blender's *Tears of Steel*, *Caminandes 1*, and *Sintel*) so you can run this end-to-end immediately:
+
+```bash
+bash demos/run_inference_demo.sh
+```
+
+The wrapper script auto-downloads the HuggingFace checkpoint into `out/` on first run.
+
+**Expected output:** Saves a 5-panel visualization for each sampled frame pair to `viz/zwm_factual_predictions/<model_name>/iter_*.png` (panels: frame 0, frame 1 ground truth, predicted patches, predicted plus unmasked patches, frame 1 GT with mask), plus `loss_value.txt` with the mean MSE between predicted and ground-truth frame 1.
+
+**Expected run time:** ~2 minutes for 10 samples on a single NVIDIA A40 (similar on other modern NVIDIA GPUs with bfloat16 support, e.g. RTX 30/40-series consumer GPUs typical of a desktop workstation), plus a one-time HuggingFace checkpoint download on first run (~30 s for the 170M model). CPU-only execution is not supported.
+
+### Raw CLI
+
+The wrapper script above is equivalent to:
+
+```bash
+python -m zwm.inv.inv_zwm_factual_prediction \
+    --videos_dir data/demo_videos/ \
+    --n_samples_to_eval 10 \
+    --num_viz 10 \
+    --model_name awwkl/zwm-bvd-170m/model.pt \
+    --frame1_mask_ratio 0.0
+```
+
+With only 3 bundled clips, the script cycles over them with replacement; each sample uses a randomly chosen frame pair (gap in [5, 16) frames) so 10 samples surface a range of gap sizes. To run on your own data, point `--videos_dir` at any directory of `.mp4` files (recursively globbed). See [zwm/inv/inv_zwm_factual_prediction.py](zwm/inv/inv_zwm_factual_prediction.py) for the full implementation.
+
+### Python API
+
+To use ZWM as a library on your own frames:
 
 ```python
 from PIL import Image
@@ -104,31 +164,6 @@ frame1 = Image.open("frame1.jpg").convert("RGB")
 out = predictor.factual_prediction(frame0, frame1, frame_gap=10, mask_ratio=0.9)
 out["frame1_pred_pil"].save("factual_prediction.png")
 ```
-
-For batched evaluation over a video dataset (samples frame pairs, runs prediction, saves visualizations), see [zwm/inv/inv_zwm_factual_prediction.py](zwm/inv/inv_zwm_factual_prediction.py).
-
-The repo bundles three short CC-BY 3.0 clips in [data/demo_videos/](data/demo_videos/) (excerpts of Blender's *Tears of Steel*, *Caminandes 1*, and *Sintel*) so you can run this end-to-end immediately:
-
-```bash
-bash demos/run_inference_demo.sh
-```
-
-This is equivalent to:
-
-```bash
-python -m zwm.inv.inv_zwm_factual_prediction \
-    --videos_dir data/demo_videos/ \
-    --n_samples_to_eval 10 \
-    --num_viz 10 \
-    --model_name awwkl/zwm-bvd-170m/model.pt \
-    --frame1_mask_ratio 0.0
-```
-
-The wrapper script also auto-downloads the HuggingFace checkpoint into `out/` on first run. With only 3 bundled clips, the script cycles over them with replacement; each sample uses a randomly chosen frame pair (gap in [5, 16) frames) so 10 samples surface a range of gap sizes. To run on your own data, point `--videos_dir` at any directory of `.mp4` files (recursively globbed).
-
-**Expected output:** Saves a 5-panel visualization for each sampled frame pair to `viz/zwm_factual_predictions/<model_name>/iter_*.png` (panels: frame 0, frame 1 ground truth, predicted patches, predicted plus unmasked patches, frame 1 GT with mask), plus `loss_value.txt` with the mean MSE between predicted and ground-truth frame 1.
-
-**Expected run time:** ~2 minutes for 10 samples on a single NVIDIA A40 (similar on other modern NVIDIA GPUs with bfloat16 support, e.g. RTX 30/40-series consumer GPUs typical of a desktop workstation), plus a one-time HuggingFace checkpoint download on first run (~30 s for the 170M model). CPU-only execution is not supported.
 
 ## Interactive Gradio demo
 
@@ -150,6 +185,8 @@ bash scripts/train_zwm_babyview_170m.sh
 
 This launches an 8-GPU torchrun with the exact recipe used to produce the released checkpoint (170M params, batch size 512, 200k iters, bfloat16, A40 reference hardware). The 1B variant uses the same recipe with a smaller `--per_device_batch_size`; see [scripts/train_zwm_babyview_1b.sh](scripts/train_zwm_babyview_1b.sh).
 
+The BabyView dataset (Long et al., 2024; https://doi.org/10.48550/arXiv.2406.10447) is hosted by Databrary at https://nyu.databrary.org/volume/1882 and https://nyu.databrary.org/volume/1856; access is granted to authorised researchers under Databrary's standard data-use agreement.
+
 Large-scale training is not the focus of this release — we recommend starting from a released checkpoint for most downstream use.
 
 ### Training smoke test
@@ -161,15 +198,6 @@ bash demos/run_training_smoketest.sh
 ```
 
 This runs 301 iterations of the 170M config on the bundled clips in [data/demo_videos/](data/demo_videos/) at `--per_device_batch_size 8`, logs loss every 10 iterations, and saves checkpoints at iters 100, 200, 300 to `out/zwm_smoketest/`. Expected run time: ~10–15 minutes on a single NVIDIA A40. This is a smoke test, not a usable training run.
-
-## Progress Update
-
-- [x] Model code + training script ([zwm/model.py](zwm/model.py), [zwm/train.py](zwm/train.py))
-- [x] Pretrained checkpoints on HuggingFace — 6 variants: {170M, 1B} × {BigVideoDataset, Kinetics, BabyView}
-- [x] Inference API — `ZWMPredictor` supports factual and hypothetical prediction ([zwm/zwm_predictor.py](zwm/zwm_predictor.py))
-- [x] Interactive Gradio demo for hypothetical generation ([demos/gradio_hypothetical.py](demos/gradio_hypothetical.py))
-- [ ] Inference + eval scripts for visual-cognitive tasks (optical flow, depth, object segments, intuitive physics)
-- [ ] Training datasets (BabyView release)
 
 ## Citation
 
