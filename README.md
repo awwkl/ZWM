@@ -29,7 +29,7 @@ ZWM has three key principles:
 - **OS**: Linux (tested on Ubuntu 20.04, kernel 5.4). Should also work on other Linux distributions; not tested on macOS or Windows.
 - **Python**: 3.10
 - **GPU**: NVIDIA GPU required for training and recommended for inference. Reference hardware: NVIDIA A40 (48 GB) with CUDA driver ≥ 12.4. Other modern NVIDIA GPUs with bfloat16 support (A100, H100, RTX 30/40 series, etc.) should also work.
-- **VRAM**: ~14 GB peak for the 170M training smoke test (`per_device_batch_size=8`, bfloat16); a single 16 GB GPU is sufficient. Replicating the full 170M / 1B BabyView training runs uses an 8-GPU node at the recipe's batch size.
+- **VRAM**: ~2–3 GB for 170M inference (the demo); ~14 GB peak for the 170M training smoke test (`per_device_batch_size=8`, bfloat16); a single 16 GB GPU is sufficient for both. Replicating the full 170M / 1B BabyView training runs uses an 8-GPU node at the recipe's batch size.
 - **Dependencies**: full pinned list in [requirements.txt](requirements.txt); high-level summary in [SOFTWARE.md](SOFTWARE.md).
 
 ## Installation
@@ -143,7 +143,7 @@ python -m zwm.inv.inv_zwm_factual_prediction \
     --n_samples_to_eval 10 \
     --num_viz 10 \
     --model_name awwkl/zwm-bvd-170m/model.pt \
-    --frame1_mask_ratio 0.0
+    --frame1_mask_ratio 0.90
 ```
 
 With only 3 bundled clips, the script cycles over them with replacement; each sample uses a randomly chosen frame pair (gap in [5, 16) frames) so 10 samples surface a range of gap sizes. To run on your own data, point `--videos_dir` at any directory of `.mp4` files (recursively globbed). See [zwm/inv/inv_zwm_factual_prediction.py](zwm/inv/inv_zwm_factual_prediction.py) for the full implementation.
