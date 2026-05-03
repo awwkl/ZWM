@@ -6,8 +6,8 @@ perturbation, then locate where the perturbation "moved" via the L2 norm of
 the RGB-prediction difference. Iterative zoom refines the prediction.
 End-Point Error (EPE) against the ground-truth target point is the metric.
 
-Ported from /ccn2/u/khaiaw/Code/ccwm/inv/predictions/inv_flow_final.py — the
-CWM (== ZWM) code path only; CCWM, MaskPSI, and PSI branches removed.
+Ported from the internal `inv_flow_final.py` script — the CWM (== ZWM) code
+path only; CCWM, MaskPSI, and PSI branches removed.
 
 Typical invocation lives in scripts/eval/flow/eval_tapvid_flow.sh; minimal
 direct invocation:

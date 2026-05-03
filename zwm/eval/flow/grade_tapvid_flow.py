@@ -8,8 +8,8 @@ Two-step pipeline:
      TapVID metrics: AD (avg distance), MD (median distance), Pct (avg %% pts
      within thresh), AJ (avg Jaccard), OA (occlusion accuracy), OF1.
 
-Ported from /ccn2/u/khaiaw/Code/ccwm/scripts/tapvid_eval_offline.py — only
-the `process_json` path; the unused `process_json_cfg`, `sparse_pkl_process`,
+Ported from the internal `tapvid_eval_offline.py` script — only the
+`process_json` path; the unused `process_json_cfg`, `sparse_pkl_process`,
 and `tapvid_eval` variants are dropped. The TapVID metric implementation
 (`compute_tapvid_metrics`) is preserved verbatim.
 
