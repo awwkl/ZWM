@@ -1,0 +1,302 @@
+[
+  {
+    "query_frame_file": "bike-packing/video/058.png",
+    "target_frame_file": "bike-packing/video/063.png",
+    "query_y_raster": 0.16073594987392426,
+    "query_x_raster": 0.5215515494346619,
+    "target_y_raster": 0.2606481611728668,
+    "target_x_raster": 0.6314118504524231,
+    "occluded": false,
+    "uid": "bike-packing_058,bike-packing_063,012"
+  },
+  {
+    "query_frame_file": "blackswan/video/000.png",
+    "target_frame_file": "blackswan/video/008.png",
+    "query_y_raster": 0.5621117949485779,
+    "query_x_raster": 0.3118206262588501,
+    "target_y_raster": 0.5486111044883728,
+    "target_x_raster": 0.3408854305744171,
+    "occluded": false,
+    "uid": "blackswan_000,blackswan_008,003"
+  },
+  {
+    "query_frame_file": "bmx-trees/video/000.png",
+    "target_frame_file": "bmx-trees/video/010.png",
+    "query_y_raster": 0.5766423344612122,
+    "query_x_raster": 0.5912467837333679,
+    "target_y_raster": 0.6336157321929932,
+    "target_x_raster": 0.5633658766746521,
+    "occluded": false,
+    "uid": "bmx-trees_000,bmx-trees_010,001"
+  },
+  {
+    "query_frame_file": "breakdance/video/000.png",
+    "target_frame_file": "breakdance/video/012.png",
+    "query_y_raster": 0.8104956150054932,
+    "query_x_raster": 0.3419302701950073,
+    "target_y_raster": 0.0,
+    "target_x_raster": 0.0,
+    "occluded": true,
+    "uid": "breakdance_000,breakdance_012,008"
+  },
+  {
+    "query_frame_file": "camel/video/000.png",
+    "target_frame_file": "camel/video/015.png",
+    "query_y_raster": 0.24358974397182465,
+    "query_x_raster": 0.4375,
+    "target_y_raster": 0.300100177526474,
+    "target_x_raster": 0.42135417461395264,
+    "occluded": false,
+    "uid": "camel_000,camel_015,008"
+  },
+  {
+    "query_frame_file": "car-roundabout/video/000.png",
+    "target_frame_file": "car-roundabout/video/000.png",
+    "query_y_raster": 0.4828711152076721,
+    "query_x_raster": 0.5395602583885193,
+    "target_y_raster": 0.4828711152076721,
+    "target_x_raster": 0.5395602583885193,
+    "occluded": false,
+    "uid": "car-roundabout_000,car-roundabout_000,015"
+  },
+  {
+    "query_frame_file": "car-shadow/video/000.png",
+    "target_frame_file": "car-shadow/video/003.png",
+    "query_y_raster": 0.27383366227149963,
+    "query_x_raster": 0.3941248655319214,
+    "target_y_raster": 0.27237972617149353,
+    "target_x_raster": 0.42756417393684387,
+    "occluded": false,
+    "uid": "car-shadow_000,car-shadow_003,012"
+  },
+  {
+    "query_frame_file": "cows/video/000.png",
+    "target_frame_file": "cows/video/007.png",
+    "query_y_raster": 0.5139751434326172,
+    "query_x_raster": 0.4882569909095764,
+    "target_y_raster": 0.520369827747345,
+    "target_x_raster": 0.47668468952178955,
+    "occluded": false,
+    "uid": "cows_000,cows_007,004"
+  },
+  {
+    "query_frame_file": "dance-twirl/video/000.png",
+    "target_frame_file": "dance-twirl/video/011.png",
+    "query_y_raster": 0.32600000500679016,
+    "query_x_raster": 0.4961257576942444,
+    "target_y_raster": 0.2639925479888916,
+    "target_x_raster": 0.5095040202140808,
+    "occluded": false,
+    "uid": "dance-twirl_000,dance-twirl_011,015"
+  },
+  {
+    "query_frame_file": "dog/video/000.png",
+    "target_frame_file": "dog/video/014.png",
+    "query_y_raster": 0.2945736348628998,
+    "query_x_raster": 0.4927370250225067,
+    "target_y_raster": 0.38842591643333435,
+    "target_x_raster": 0.44453126192092896,
+    "occluded": false,
+    "uid": "dog_000,dog_014,005"
+  },
+  {
+    "query_frame_file": "dogs-jump/video/029.png",
+    "target_frame_file": "dogs-jump/video/034.png",
+    "query_y_raster": 0.5910852551460266,
+    "query_x_raster": 0.5516038537025452,
+    "target_y_raster": 0.4176182746887207,
+    "target_x_raster": 0.6900498270988464,
+    "occluded": false,
+    "uid": "dogs-jump_029,dogs-jump_034,018"
+  },
+  {
+    "query_frame_file": "drift-chicane/video/000.png",
+    "target_frame_file": "drift-chicane/video/008.png",
+    "query_y_raster": 0.411220520734787,
+    "query_x_raster": 0.5297672152519226,
+    "target_y_raster": 0.4106481373310089,
+    "target_x_raster": 0.5309895873069763,
+    "occluded": false,
+    "uid": "drift-chicane_000,drift-chicane_008,006"
+  },
+  {
+    "query_frame_file": "drift-straight/video/000.png",
+    "target_frame_file": "drift-straight/video/010.png",
+    "query_y_raster": 0.42883211374282837,
+    "query_x_raster": 0.9248495101928711,
+    "target_y_raster": 0.0,
+    "target_x_raster": 0.0,
+    "occluded": true,
+    "uid": "drift-straight_000,drift-straight_010,016"
+  },
+  {
+    "query_frame_file": "goat/video/000.png",
+    "target_frame_file": "goat/video/012.png",
+    "query_y_raster": 0.30474454164505005,
+    "query_x_raster": 0.546082079410553,
+    "target_y_raster": 0.3782407343387604,
+    "target_x_raster": 0.6460937261581421,
+    "occluded": false,
+    "uid": "goat_000,goat_012,001"
+  },
+  {
+    "query_frame_file": "gold-fish/video/000.png",
+    "target_frame_file": "gold-fish/video/015.png",
+    "query_y_raster": 0.7970085740089417,
+    "query_x_raster": 0.567307710647583,
+    "target_y_raster": 0.802314817905426,
+    "target_x_raster": 0.5955728888511658,
+    "occluded": false,
+    "uid": "gold-fish_000,gold-fish_015,010"
+  },
+  {
+    "query_frame_file": "horsejump-high/video/000.png",
+    "target_frame_file": "horsejump-high/video/000.png",
+    "query_y_raster": 0.31200000643730164,
+    "query_x_raster": 0.3498755395412445,
+    "target_y_raster": 0.31200000643730164,
+    "target_x_raster": 0.3498755395412445,
+    "occluded": false,
+    "uid": "horsejump-high_000,horsejump-high_000,004"
+  },
+  {
+    "query_frame_file": "india/video/000.png",
+    "target_frame_file": "india/video/003.png",
+    "query_y_raster": 0.6119999885559082,
+    "query_x_raster": 0.49162575602531433,
+    "target_y_raster": 0.606249988079071,
+    "target_x_raster": 0.490234375,
+    "occluded": false,
+    "uid": "india_000,india_003,024"
+  },
+  {
+    "query_frame_file": "judo/video/000.png",
+    "target_frame_file": "judo/video/007.png",
+    "query_y_raster": 0.1794871836900711,
+    "query_x_raster": 0.45913460850715637,
+    "target_y_raster": 0.244907408952713,
+    "target_x_raster": 0.42369791865348816,
+    "occluded": false,
+    "uid": "judo_000,judo_007,003"
+  },
+  {
+    "query_frame_file": "kite-surf/video/004.png",
+    "target_frame_file": "kite-surf/video/015.png",
+    "query_y_raster": 0.44017094373703003,
+    "query_x_raster": 0.3834134638309479,
+    "target_y_raster": 0.4671296179294586,
+    "target_x_raster": 0.3606770932674408,
+    "occluded": false,
+    "uid": "kite-surf_004,kite-surf_015,019"
+  },
+  {
+    "query_frame_file": "lab-coat/video/000.png",
+    "target_frame_file": "lab-coat/video/014.png",
+    "query_y_raster": 0.55474454164505,
+    "query_x_raster": 0.46293801069259644,
+    "target_y_raster": 0.6467592716217041,
+    "target_x_raster": 0.5205729007720947,
+    "occluded": false,
+    "uid": "lab-coat_000,lab-coat_014,008"
+  },
+  {
+    "query_frame_file": "libby/video/033.png",
+    "target_frame_file": "libby/video/038.png",
+    "query_y_raster": 0.26790016889572144,
+    "query_x_raster": 0.986177384853363,
+    "target_y_raster": 0.27795031666755676,
+    "target_x_raster": 0.8516110181808472,
+    "occluded": false,
+    "uid": "libby_033,libby_038,021"
+  },
+  {
+    "query_frame_file": "loading/video/000.png",
+    "target_frame_file": "loading/video/008.png",
+    "query_y_raster": 0.3076923191547394,
+    "query_x_raster": 0.6466346383094788,
+    "target_y_raster": 0.17988558113574982,
+    "target_x_raster": 0.6961951851844788,
+    "occluded": false,
+    "uid": "loading_000,loading_008,022"
+  },
+  {
+    "query_frame_file": "mbike-trick/video/000.png",
+    "target_frame_file": "mbike-trick/video/010.png",
+    "query_y_raster": 0.48250728845596313,
+    "query_x_raster": 0.5395446419715881,
+    "target_y_raster": 0.47110679745674133,
+    "target_x_raster": 0.5685648322105408,
+    "occluded": false,
+    "uid": "mbike-trick_000,mbike-trick_010,019"
+  },
+  {
+    "query_frame_file": "motocross-jump/video/001.png",
+    "target_frame_file": "motocross-jump/video/013.png",
+    "query_y_raster": 0.6159999966621399,
+    "query_x_raster": 0.6963760852813721,
+    "target_y_raster": 0.6995370388031006,
+    "target_x_raster": 0.6559895873069763,
+    "occluded": false,
+    "uid": "motocross-jump_001,motocross-jump_013,004"
+  },
+  {
+    "query_frame_file": "paragliding-launch/video/000.png",
+    "target_frame_file": "paragliding-launch/video/015.png",
+    "query_y_raster": 0.5199999809265137,
+    "query_x_raster": 0.5073757767677307,
+    "target_y_raster": 0.5310184955596924,
+    "target_x_raster": 0.4794270694255829,
+    "occluded": false,
+    "uid": "paragliding-launch_000,paragliding-launch_015,009"
+  },
+  {
+    "query_frame_file": "parkour/video/000.png",
+    "target_frame_file": "parkour/video/000.png",
+    "query_y_raster": 0.2759999930858612,
+    "query_x_raster": 0.6738760471343994,
+    "target_y_raster": 0.2759999930858612,
+    "target_x_raster": 0.6738760471343994,
+    "occluded": false,
+    "uid": "parkour_000,parkour_000,003"
+  },
+  {
+    "query_frame_file": "pigs/video/000.png",
+    "target_frame_file": "pigs/video/003.png",
+    "query_y_raster": 0.5059999823570251,
+    "query_x_raster": 0.3048754632472992,
+    "target_y_raster": 0.5060288906097412,
+    "target_x_raster": 0.3147062063217163,
+    "occluded": false,
+    "uid": "pigs_000,pigs_003,011"
+  },
+  {
+    "query_frame_file": "scooter-black/video/000.png",
+    "target_frame_file": "scooter-black/video/007.png",
+    "query_y_raster": 0.37105801701545715,
+    "query_x_raster": 0.7455184459686279,
+    "target_y_raster": 0.3808381259441376,
+    "target_x_raster": 0.6888778209686279,
+    "occluded": false,
+    "uid": "scooter-black_000,scooter-black_007,002"
+  },
+  {
+    "query_frame_file": "shooting/video/004.png",
+    "target_frame_file": "shooting/video/015.png",
+    "query_y_raster": 0.6295486688613892,
+    "query_x_raster": 0.35538461804389954,
+    "target_y_raster": 0.5058543682098389,
+    "target_x_raster": 0.3384615480899811,
+    "occluded": false,
+    "uid": "shooting_004,shooting_015,022"
+  },
+  {
+    "query_frame_file": "soapbox/video/000.png",
+    "target_frame_file": "soapbox/video/014.png",
+    "query_y_raster": 0.2700729966163635,
+    "query_x_raster": 0.25969693064689636,
+    "target_y_raster": 0.32797229290008545,
+    "target_x_raster": 0.3154911994934082,
+    "occluded": false,
+    "uid": "soapbox_000,soapbox_014,010"
+  }
+]

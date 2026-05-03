@@ -2,11 +2,11 @@
 Download a ZWM checkpoint from HuggingFace Hub into ./out/
 
 Usage:
-    python scripts/hf_model_download.py awwkl/zwm-bvd-170m
-    python scripts/hf_model_download.py awwkl/zwm-bvd-170m --filename model.pt
+    python scripts/hf_model_download.py awwkl/zwm-babyview-170m
+    python scripts/hf_model_download.py awwkl/zwm-babyview-170m --filename model.pt
 
 Result:
-    ./out/awwkl/zwm-bvd-170m/model.pt
+    ./out/awwkl/zwm-babyview-170m/model.pt
 """
 
 import argparse
@@ -48,7 +48,7 @@ def download(repo_id: str, filename: str = "model.pt", out_root: str = None) -> 
 
 def main():
     parser = argparse.ArgumentParser(description="Download a ZWM checkpoint from HuggingFace Hub.")
-    parser.add_argument("repo_id", help="HF repo id, e.g. awwkl/zwm-bvd-170m")
+    parser.add_argument("repo_id", help="HF repo id, e.g. awwkl/zwm-babyview-170m")
     parser.add_argument("--filename", default="model.pt", help="File to download (default: model.pt)")
     parser.add_argument("--out", default=None, help="Override destination root (default: <repo>/out)")
     args = parser.parse_args()

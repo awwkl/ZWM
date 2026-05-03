@@ -3,7 +3,7 @@ CUDA_VISIBLE_DEVICES=0 \
 python zwm/inv/inv_zwm_factual_prediction.py \
     --videos_dir /ccn2/dataset/kinetics400/Kinetics400/k400/val/ \
     --n_samples_to_eval 100 \
-    --model_name awwkl/zwm-bvd-170m/model.pt \
+    --model_name awwkl/zwm-babyview-170m/model.pt \
 """
 
 import os
@@ -37,7 +37,7 @@ np.random.seed(42)
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default='awwkl/zwm-bvd-170m/model.pt', help='ZWM Model Name (from huggingface)')
+    parser.add_argument('--model_name', type=str, default='awwkl/zwm-babyview-170m/model.pt', help='ZWM Model Name (from huggingface)')
     parser.add_argument('--videos_dir', type=str, help='path to videos')
     parser.add_argument('--out_viz_dir', type=str, default='viz/zwm_factual_predictions', help='path to output directory')
     parser.add_argument('--n_samples_to_eval', type=int, default=1000, help='number of samples to evaluate')

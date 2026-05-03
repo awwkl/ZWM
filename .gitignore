@@ -18,6 +18,7 @@ env/
 # IDE
 .vscode/
 .idea/
+.claude/
 
 # OS
 .DS_Store
@@ -29,3 +30,9 @@ viz/
 .gradio/
 wandb/
 *.pt
+
+# Extracted eval-frame caches (users populate via scripts/eval/flow/extract_*)
+data/evals/**/frames/
+
+# Eval ground-truth pickles (users download separately, e.g. from Google Drive)
+data/evals/**/*.pkl

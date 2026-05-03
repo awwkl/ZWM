@@ -2,7 +2,7 @@
 CUDA_VISIBLE_DEVICES=5 \
 python zwm/inv/inv_zwm_extract_activations.py \
     --image_dir /path/to/image_dir \
-    --model_name awwkl/zwm-bvd-170m/model.pt \
+    --model_name awwkl/zwm-babyview-170m/model.pt \
     --forward_mode two_image \
     --debug \
 """
@@ -28,7 +28,7 @@ np.random.seed(42)
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default='awwkl/zwm-bvd-170m/model.pt', help='ZWM Model Name (from gcloud)')
+    parser.add_argument('--model_name', type=str, default='awwkl/zwm-babyview-170m/model.pt', help='ZWM Model Name (from gcloud)')
     parser.add_argument('--image_dir', type=str, help='path to images')
     parser.add_argument('--out_viz_dir', type=str, default='viz/extract_activations', help='path to output directory')
     parser.add_argument('--forward_mode', type=str, default='one_image', choices=['one_image', 'one_image_plus_10perc', 'two_image'], help='which forward mode to use')

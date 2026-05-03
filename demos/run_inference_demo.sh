@@ -21,7 +21,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-MODEL_NAME="${MODEL_NAME:-awwkl/zwm-bvd-170m/model.pt}"
+MODEL_NAME="${MODEL_NAME:-awwkl/zwm-babyview-170m/model.pt}"
 VIDEOS_DIR="${VIDEOS_DIR:-data/demo_videos/}"
 N_SAMPLES="${N_SAMPLES:-10}"
 

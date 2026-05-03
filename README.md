@@ -59,18 +59,20 @@ Typical install time on a normal desktop workstation with a fast network: ~5–1
 
 ```
 ZWM/
-├── zwm/                  # Python package: model, training, inference
+├── zwm/                  # Python package: model, training, inference, eval
 │   ├── train.py          #   entry point for training
 │   ├── zwm_predictor.py  #   ZWMPredictor — factual + hypothetical inference API
 │   ├── inv/              #   batched-inference scripts (e.g. factual prediction)
+│   ├── eval/             #   benchmark eval suite (e.g. eval/flow/ for TAP-Vid)
 │   ├── data/             #   dataset + patch-sequence loaders
 │   ├── utils/            #   model wrapper, sequence construction, viz helpers
 │   └── config.py         #   ZWM_170MConfig, ZWM_1BConfig
-├── scripts/              # Training replication recipes + HF download utilities
+├── scripts/              # Training recipes, HF download, eval/ wrappers
 ├── demos/                # Reviewer-facing demos (Gradio, inference, smoke test)
 ├── data/demo_videos/     # Bundled CC-BY clips for the inference demo
+├── data/evals/           # Bundled iteration plans for benchmark evals
 ├── out/                  # Model checkpoints (downloaded or trained)
-├── viz/                  # Inference visualization outputs
+├── viz/                  # Inference and eval visualization outputs
 ├── requirements.txt      # Pinned dependencies
 ├── SOFTWARE.md           # Software policy / version manifest
 └── LICENSE               # MIT
@@ -89,10 +91,10 @@ ZWM/
 
 Download a checkpoint into `./out/`:
 ```bash
-python scripts/hf_model_download.py awwkl/zwm-bvd-170m
+python scripts/hf_model_download.py awwkl/zwm-babyview-170m
 ```
 
-This places the file at `out/awwkl/zwm-bvd-170m/model.pt`. Throughout the rest of the README, `ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")` and equivalent `--model_name` arguments refer to this relative path under `out/` — not a HuggingFace ID directly.
+This places the file at `out/awwkl/zwm-babyview-170m/model.pt`. Throughout the rest of the README, `ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")` and equivalent `--model_name` arguments refer to this relative path under `out/` — not a HuggingFace ID directly.
 
 ## Quickstart — Hypothetical prediction
 
@@ -103,7 +105,7 @@ import numpy as np
 from PIL import Image
 from zwm.zwm_predictor import ZWMPredictor
 
-predictor = ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")
+predictor = ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")
 frame0 = Image.open("demos/assets/examples/bag.jpg").convert("RGB")
 
 # Each row is (x1, y1, x2, y2) in pixel coords at the model resolution (256).
@@ -142,7 +144,7 @@ python -m zwm.inv.inv_zwm_factual_prediction \
     --videos_dir data/demo_videos/ \
     --n_samples_to_eval 10 \
     --num_viz 10 \
-    --model_name awwkl/zwm-bvd-170m/model.pt \
+    --model_name awwkl/zwm-babyview-170m/model.pt \
     --frame1_mask_ratio 0.90
 ```
 
@@ -156,7 +158,7 @@ To use ZWM as a library on your own frames:
 from PIL import Image
 from zwm.zwm_predictor import ZWMPredictor
 
-predictor = ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")
+predictor = ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")
 # Replace these with two consecutive frames from your own video.
 frame0 = Image.open("frame0.jpg").convert("RGB")
 frame1 = Image.open("frame1.jpg").convert("RGB")
@@ -170,7 +172,7 @@ out["frame1_pred_pil"].save("factual_prediction.png")
 Launch a browser UI for hypothetical prediction — click an image to mark a patch, drag to specify where it should move, and watch the model fill in the rest:
 
 ```bash
-python -m demos.gradio_hypothetical --model_name awwkl/zwm-bvd-170m/model.pt
+python -m demos.gradio_hypothetical --model_name awwkl/zwm-babyview-170m/model.pt
 ```
 
 ## Training
@@ -198,6 +200,49 @@ bash demos/run_training_smoketest.sh
 ```
 
 This runs 301 iterations of the 170M config on the bundled clips in [data/demo_videos/](data/demo_videos/) at `--per_device_batch_size 8`, logs loss every 10 iterations, and saves checkpoints at iters 100, 200, 300 to `out/zwm_smoketest/`. Expected run time: ~10–15 minutes on a single NVIDIA A40. This is a smoke test, not a usable training run.
+
+## Evaluation
+
+The [zwm/eval/](zwm/eval/) package holds the benchmark suite. Each task lives under its own subpackage with the Python entrypoint, a shell wrapper in [scripts/eval/](scripts/eval/), and a bundled iteration plan under [data/evals/](data/evals/).
+
+### Optical Flow: TAP-Vid DAVIS — counterfactual point tracking
+
+Predicts where a query point moves between two frames by *perturbing* the patch around the query point in frame0, predicting frame1 with and without the perturbation, and locating the perturbation's "shadow" in the RGB-prediction difference map. Iterative zoom refines the prediction. End-Point Error (EPE) against TAP-Vid-DAVIS ground-truth tracks is the metric.
+
+**One-time data prep.** The bundled [data/evals/flow/tapvid_davis_first/dataset.json](data/evals/flow/tapvid_davis_first/dataset.json) is the iteration plan (~38 K query/target point pairs over 30 DAVIS videos). Frames and ground-truth tracks live in the official TAP-Vid-DAVIS pickle (CC-BY 4.0; ~2.4 GB).
+
+1. Download the pickle from the [TAP-Vid project page](https://storage.googleapis.com/dm-tapnet/index.html) — direct link: <https://storage.googleapis.com/dm-tapnet/tapvid_davis.zip>.
+2. Unzip and place `tapvid_davis.pkl` at `data/evals/flow/tapvid_davis_first/tapvid_davis.pkl` (the path the eval and grader scripts expect).
+3. Expand the embedded video frames into per-frame PNGs:
+
+   ```bash
+   python scripts/eval/flow/extract_tapvid_davis_pkl.py \
+       --pkl_path data/evals/flow/tapvid_davis_first/tapvid_davis.pkl \
+       --out_dir data/evals/flow/tapvid_davis_first/frames/
+   ```
+
+   Writes ~1.2 GB of PNGs at `<video>/video/<idx>.png`. The pickle and the `frames/` directory are both gitignored.
+
+**Run the eval.** Two wrapper scripts — pick one. Both have all settings hardcoded near the top of the file; edit those values rather than passing CLI flags.
+
+- **Smoketest (~10 min):** [scripts/eval/flow/eval_tapvid_flow_demo.sh](scripts/eval/flow/eval_tapvid_flow_demo.sh) runs the recipe on the bundled 30-entry demo subset (one point per DAVIS video, frame gaps spanning [0, 15]) and visualizes every point.
+- **Full benchmark (~18 hours on a single A40 for the 170M):** [scripts/eval/flow/eval_tapvid_flow.sh](scripts/eval/flow/eval_tapvid_flow.sh) runs the full 38881-point set. To shard across GPUs, copy the file and edit `START_IDX` / `NUM_POINTS` per shard.
+
+```bash
+bash scripts/eval/flow/eval_tapvid_flow_demo.sh   # smoketest
+bash scripts/eval/flow/eval_tapvid_flow.sh        # full benchmark
+```
+
+Both scripts default to `awwkl/zwm-babyview-170m/model.pt` (170M BabyView). Edit `CKPT=` near the top to swap models. The recipe (5 mask rollouts × 5 zoom passes, `mask_ratio=0.9`, dynamic frame gap clamped to [5, 15], `--no_blur --squish --compile`) is fixed and matches the published configuration. Outputs land under `viz/eval/flow/tapvid_davis_first{,_demo}/std_2_zoom_4/<model_slug>_mask_ratio_0.9/{viz,results,flags,args}/`.
+
+**Compute metrics.** Aggregate per-shard JSONs into TAP-Vid metrics (AD, MD, Pct, AJ, OA, OF1). Two graders matching the two evals — edit `PKL_PATH` (and `ROOT_DIR` if your eval output is elsewhere) before running:
+
+```bash
+bash scripts/eval/flow/grade_tapvid_flow_demo.sh   # grade the smoketest
+bash scripts/eval/flow/grade_tapvid_flow.sh        # grade the full benchmark
+```
+
+The demo grader passes `--sample` so metrics are restricted to the points actually evaluated (otherwise un-evaluated trajectory slots in the 38881-cell grid would score trivially perfect — pred=gt=0 — and inflate Pct / deflate AD). Demo numbers are still over a small 30-point subset and shouldn't be quoted as benchmark results, but they're directly comparable to the per-point EPE printed by the eval itself.
 
 ## Citation
 

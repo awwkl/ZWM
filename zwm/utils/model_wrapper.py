@@ -145,8 +145,8 @@ class ModelFactory:
             Path relative to `out/`. Can be either a directory (resolves to
             `<model_name>/model.pt`) or a full path to a .pt file.
             Examples:
-              "awwkl/zwm-bvd-170m"                 → out/awwkl/zwm-bvd-170m/model.pt
-              "awwkl/zwm-bvd-170m/model.pt"        → out/awwkl/zwm-bvd-170m/model.pt
+              "awwkl/zwm-babyview-170m"            → out/awwkl/zwm-babyview-170m/model.pt
+              "awwkl/zwm-babyview-170m/model.pt"   → out/awwkl/zwm-babyview-170m/model.pt
               "ZWM_170M_custom_data/model_00200000.pt"
                 → out/ZWM_170M_custom_data/model_00200000.pt
             To fetch a model from HuggingFace Hub into `out/`, use
