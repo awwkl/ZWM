@@ -30,6 +30,7 @@ viz/
 .gradio/
 wandb/
 *.pt
+**/.gitattributes
 
 # Extracted eval-frame caches (users populate via scripts/eval/flow/extract_*)
 data/evals/**/frames/
