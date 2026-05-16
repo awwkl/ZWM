@@ -37,3 +37,4 @@ data/evals/**/frames/
 
 # Eval ground-truth pickles (users download separately, e.g. from Google Drive)
 data/evals/**/*.pkl
+**/*.h5
