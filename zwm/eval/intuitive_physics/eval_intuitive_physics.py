@@ -12,7 +12,7 @@ normally invoked directly.
 
 Usage (typically via the launcher, not directly):
     python -m zwm.eval.intuitive_physics.eval_intuitive_physics \
-        --model_name awwkl/zwm-babyview-170m/model.pt \
+        --model_name awwkl/zwm-bvd-170m/model.pt \
         --dataset_dir data/evals/intuitive_physics \
         --items 1.cohesion_000 1.cohesion_001 \
         --seeds 0 1 2 3 4 5 6 7 \
@@ -34,7 +34,7 @@ from zwm.zwm_predictor import ZWMPredictor
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--model_name', type=str, required=True,
-                   help='HF repo path or local checkpoint, e.g. awwkl/zwm-babyview-170m/model.pt')
+                   help='HF repo path or local checkpoint, e.g. awwkl/zwm-bvd-170m/model.pt')
     p.add_argument('--dataset_dir', type=str, required=True,
                    help='Root with annotations.csv + keyframes/.')
     p.add_argument('--items', type=str, nargs='+', required=True,

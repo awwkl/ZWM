@@ -19,7 +19,7 @@
 
 set -xeuo pipefail
 
-CKPT=awwkl/zwm-babyview-170m/model.pt
+CKPT=awwkl/zwm-bvd-170m/model.pt
 
 # Recipe knobs — same as the full eval, so demo behavior matches.
 NUM_ROLLOUTS=5

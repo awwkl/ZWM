@@ -4,7 +4,7 @@ Gradio demo for ZWM hypothetical prediction.
 Launch:
     cd ZWM
     python -m demos.gradio_hypothetical
-    python -m demos.gradio_hypothetical --model_name awwkl/zwm-babyview-1b/model.pt
+    python -m demos.gradio_hypothetical --model_name awwkl/zwm-bvd-1b/model.pt
 
 The model checkpoint is auto-downloaded from HuggingFace if not already present
 under ./out/.
@@ -41,7 +41,7 @@ DISPLAY_RES = 512
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name", type=str, default="awwkl/zwm-babyview-170m/model.pt",
+    parser.add_argument("--model_name", type=str, default="awwkl/zwm-bvd-170m/model.pt",
                         help="ZWM checkpoint name (path under ./out/ or HF-downloaded path)")
     parser.add_argument("--examples_dir", type=str, default="demos/assets/examples",
                         help="Directory of sample images displayed in the gallery")

@@ -93,10 +93,10 @@ ZWM/
 
 Download a checkpoint into `./out/`:
 ```bash
-python scripts/hf_model_download.py awwkl/zwm-babyview-170m
+python scripts/hf_model_download.py awwkl/zwm-bvd-170m
 ```
 
-This places the file at `out/awwkl/zwm-babyview-170m/model.pt`. Throughout the rest of the README, `ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")` and equivalent `--model_name` arguments refer to this relative path under `out/` — not a HuggingFace ID directly.
+This places the file at `out/awwkl/zwm-bvd-170m/model.pt`. Throughout the rest of the README, `ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")` and equivalent `--model_name` arguments refer to this relative path under `out/` — not a HuggingFace ID directly.
 
 ## Quickstart — Hypothetical prediction
 
@@ -107,7 +107,7 @@ import numpy as np
 from PIL import Image
 from zwm.zwm_predictor import ZWMPredictor
 
-predictor = ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")
+predictor = ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")
 frame0 = Image.open("demos/assets/examples/bag.jpg").convert("RGB")
 
 # Each row is (x1, y1, x2, y2) in pixel coords at the model resolution (256).
@@ -146,7 +146,7 @@ python -m zwm.inv.inv_zwm_factual_prediction \
     --videos_dir data/demo_videos/ \
     --n_samples_to_eval 10 \
     --num_viz 10 \
-    --model_name awwkl/zwm-babyview-170m/model.pt \
+    --model_name awwkl/zwm-bvd-170m/model.pt \
     --frame1_mask_ratio 0.90
 ```
 
@@ -160,7 +160,7 @@ To use ZWM as a library on your own frames:
 from PIL import Image
 from zwm.zwm_predictor import ZWMPredictor
 
-predictor = ZWMPredictor("awwkl/zwm-babyview-170m/model.pt")
+predictor = ZWMPredictor("awwkl/zwm-bvd-170m/model.pt")
 # Replace these with two consecutive frames from your own video.
 frame0 = Image.open("frame0.jpg").convert("RGB")
 frame1 = Image.open("frame1.jpg").convert("RGB")
@@ -174,7 +174,7 @@ out["frame1_pred_pil"].save("factual_prediction.png")
 Launch a browser UI for hypothetical prediction — click an image to mark a patch, drag to specify where it should move, and watch the model fill in the rest:
 
 ```bash
-python -m demos.gradio_hypothetical --model_name awwkl/zwm-babyview-170m/model.pt
+python -m demos.gradio_hypothetical --model_name awwkl/zwm-bvd-170m/model.pt
 ```
 
 ## Training
@@ -235,7 +235,7 @@ bash scripts/eval/flow/eval_tapvid_flow_demo.sh   # smoketest
 bash scripts/eval/flow/eval_tapvid_flow.sh        # full benchmark
 ```
 
-Both scripts default to `awwkl/zwm-babyview-170m/model.pt` (170M BabyView). Edit `CKPT=` near the top to swap models. The recipe (5 mask rollouts × 5 zoom passes, `mask_ratio=0.9`, dynamic frame gap clamped to [5, 15], `--no_blur --squish --compile`) is fixed and matches the published configuration. Outputs land under `viz/eval/flow/tapvid_davis_first{,_demo}/std_2_zoom_4/<model_slug>_mask_ratio_0.9/{viz,results,flags,args}/`.
+Both scripts default to `awwkl/zwm-bvd-170m/model.pt` (170M BigVideoDataset). Edit `CKPT=` near the top to swap models. The recipe (5 mask rollouts × 5 zoom passes, `mask_ratio=0.9`, dynamic frame gap clamped to [5, 15], `--no_blur --squish --compile`) is fixed and matches the published configuration. Outputs land under `viz/eval/flow/tapvid_davis_first{,_demo}/std_2_zoom_4/<model_slug>_mask_ratio_0.9/{viz,results,flags,args}/`.
 
 **Compute metrics.** Aggregate per-shard JSONs into TAP-Vid metrics (AD, MD, Pct, AJ, OA, OF1). Two graders matching the two evals — edit `PKL_PATH` (and `ROOT_DIR` if your eval output is elsewhere) before running:
 

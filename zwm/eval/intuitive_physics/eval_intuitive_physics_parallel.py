@@ -8,7 +8,7 @@ loads once per GPU, not once per seed).
 Usage:
     python -m zwm.eval.intuitive_physics.eval_intuitive_physics_parallel \
         --gpus 0 1 2 3 4 5 6 7 \
-        --model_name awwkl/zwm-babyview-170m/model.pt \
+        --model_name awwkl/zwm-bvd-170m/model.pt \
         --dataset_dir data/evals/intuitive_physics \
         --output_dir viz/eval/intuitive_physics/seeds8_gap10 \
         --seeds 0 1 2 3 4 5 6 7 --frame_gap 10

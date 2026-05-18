@@ -6,9 +6,9 @@
 
 set -euo pipefail
 
-# Default: babyview-170m. Override with e.g.:
-#   CKPT=awwkl/zwm-bvd-170m/model.pt bash scripts/eval/intuitive_physics/grade_intuitive_physics.sh
-CKPT="${CKPT:-awwkl/zwm-babyview-170m/model.pt}"
+# Default: bvd-170m. Override with e.g.:
+#   CKPT=awwkl/zwm-babyview-170m/model.pt bash scripts/eval/intuitive_physics/grade_intuitive_physics.sh
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 MODEL_SLUG="$(echo "$CKPT" | tr '/' '_' | sed 's/\.pt$//')"
 
 # Must match the RECIPE used by eval_intuitive_physics.sh.

@@ -7,7 +7,7 @@ recipe knobs are forwarded verbatim to each worker.
 Usage:
     python -m zwm.eval.segments.eval_spelke_seg_parallel \\
         --gpus 0 1 2 3 \\
-        --model_name awwkl/zwm-babyview-170m/model.pt \\
+        --model_name awwkl/zwm-bvd-170m/model.pt \\
         --dataset_path data/evals/segments/spelke_bench.h5 \\
         --output_dir viz/eval/segments/spelke_bench/seq16_seeds3_dirs8_zoom0 \\
         --num_seq_patches 16 --num_seeds 3 --num_dirs 8 --num_zoom_iters 0 --num_zoom_dirs 5 \\

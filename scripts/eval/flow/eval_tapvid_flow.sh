@@ -20,7 +20,7 @@
 
 set -xeuo pipefail
 
-CKPT=awwkl/zwm-babyview-170m/model.pt
+CKPT=awwkl/zwm-bvd-170m/model.pt
 START_IDX=0
 NUM_POINTS=38881
 

@@ -20,8 +20,8 @@
 
 set -xeuo pipefail
 
-# Default: babyview-170m. Override with e.g. `CKPT=awwkl/zwm-bvd-170m/model.pt bash ...`.
-CKPT="${CKPT:-awwkl/zwm-babyview-170m/model.pt}"
+# Default: bvd-170m. Override with e.g. `CKPT=awwkl/zwm-babyview-170m/model.pt bash ...`.
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 GPUS=(0 1 2 3 4 5 6 7)  # Override by editing here.
 SEEDS=(0 1 2 3 4 5 6 7)  # 8 seeds per item (matches CWM publication).
 

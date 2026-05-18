@@ -13,7 +13,7 @@ Typical invocation lives in scripts/eval/flow/eval_tapvid_flow.sh; minimal
 direct invocation:
 
     python -m zwm.eval.flow.eval_tapvid_flow \\
-        --model_name awwkl/zwm-babyview-170m/model.pt \\
+        --model_name awwkl/zwm-bvd-170m/model.pt \\
         --data_path data/evals/flow/tapvid_davis_first/dataset.json \\
         --num_flat_points_to_process 10 --viz_all
 """
@@ -42,7 +42,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     # Core inputs
     parser.add_argument('--model_name', type=str, required=True,
-                        help='ZWM model checkpoint relative to out/, e.g. awwkl/zwm-babyview-170m/model.pt')
+                        help='ZWM model checkpoint relative to out/, e.g. awwkl/zwm-bvd-170m/model.pt')
     parser.add_argument('--data_path', type=str, required=True,
                         help='Path to TapVID-style dataset.json with query/target point pairs.')
     parser.add_argument('--frames_root', type=str, default=None,

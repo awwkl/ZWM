@@ -28,8 +28,8 @@
 
 set -xeuo pipefail
 
-# Default: babyview-170m. Override with e.g. `CKPT=awwkl/zwm-bvd-170m/model.pt bash ...`.
-CKPT="${CKPT:-awwkl/zwm-babyview-170m/model.pt}"
+# Default: bvd-170m. Override with e.g. `CKPT=awwkl/zwm-babyview-170m/model.pt bash ...`.
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 START_IDX=0
 NUM_POINTS=328
 

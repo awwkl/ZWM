@@ -6,7 +6,7 @@ segmentation for each GT segment's centroid, and writes one
 
 Usage:
     python -m zwm.eval.segments.eval_spelke_seg \\
-        --model_name awwkl/zwm-babyview-170m/model.pt \\
+        --model_name awwkl/zwm-bvd-170m/model.pt \\
         --dataset_path data/evals/segments/spelke_bench.h5 \\
         --img_names image_3345 image_3346 \\
         --output_dir viz/eval/segments/spelke_bench/seq16_seeds3_dirs8_zoom0 \\
@@ -48,7 +48,7 @@ FLOW_COND_BASE = [
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--model_name', type=str, required=True,
-                   help='HF repo path or local checkpoint, e.g. awwkl/zwm-babyview-170m/model.pt')
+                   help='HF repo path or local checkpoint, e.g. awwkl/zwm-bvd-170m/model.pt')
     p.add_argument('--dataset_path', type=str, required=True)
     p.add_argument('--img_names', type=str, nargs='+', required=True,
                    help='h5 keys to process on this worker.')

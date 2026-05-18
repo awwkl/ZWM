@@ -9,9 +9,9 @@
 
 set -euo pipefail
 
-# Default: babyview-170m. Override with e.g.:
-#   CKPT=awwkl/zwm-bvd-170m/model.pt bash scripts/eval/depth/grade_stereo_depth.sh
-CKPT="${CKPT:-awwkl/zwm-babyview-170m/model.pt}"
+# Default: bvd-170m. Override with e.g.:
+#   CKPT=awwkl/zwm-babyview-170m/model.pt bash scripts/eval/depth/grade_stereo_depth.sh
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 MODEL_SLUG="$(echo "$CKPT" | tr '/' '_' | sed 's/\.pt$//')"
 ROOT_DIR="viz/eval/depth/stereo_depth/std_2_zoom_4/${MODEL_SLUG}_mask_ratio_0.9"
 

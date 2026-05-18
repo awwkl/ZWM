@@ -22,8 +22,8 @@
 
 set -xeuo pipefail
 
-# Default: babyview-170m. Override with e.g. `CKPT=awwkl/zwm-bvd-170m/model.pt bash ...`.
-CKPT="${CKPT:-awwkl/zwm-babyview-170m/model.pt}"
+# Default: bvd-170m. Override with e.g. `CKPT=awwkl/zwm-babyview-170m/model.pt bash ...`.
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 GPUS=(4 5 6 7)  # Override with e.g. `GPUS=(0 1)` for a 2-GPU run.
 
 # Recipe knobs — fixed; matches the SpelkeNet/SpelkeBench CWM configuration.
