@@ -89,6 +89,8 @@ ZWM/
 | [`awwkl/zwm-babyview-170m`](https://huggingface.co/awwkl/zwm-babyview-170m) | BabyView | 170M | 256 |
 | [`awwkl/zwm-babyview-1b`](https://huggingface.co/awwkl/zwm-babyview-1b) | BabyView | 1B | 256 |
 
+> **Access note:** Due to the sensitive nature of the data that BabyZWM was trained on, we request that you email the owner <khaiaw@stanford.edu> for access. **This applies only for ZWM models trained on BabyView.**
+
 Download a checkpoint into `./out/`:
 ```bash
 python scripts/hf_model_download.py awwkl/zwm-babyview-170m
