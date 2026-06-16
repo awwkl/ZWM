@@ -25,6 +25,7 @@ env/
 
 # No need to track these
 tmp/
+personal_notes/
 personal_scripts/
 viz/
 .gradio/
