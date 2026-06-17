@@ -62,18 +62,21 @@ ZWM/
 ├── zwm/                  # Python package: model, training, inference, eval
 │   ├── train.py          #   entry point for training
 │   ├── zwm_predictor.py  #   ZWMPredictor — factual + hypothetical inference API
+│   ├── model.py          #   core model definition
 │   ├── inv/              #   batched-inference scripts (e.g. factual prediction)
 │   ├── eval/             #   benchmark eval suite (e.g. eval/flow/ for TAP-Vid)
 │   ├── data/             #   dataset + patch-sequence loaders
 │   ├── utils/            #   model wrapper, sequence construction, viz helpers
 │   └── config.py         #   ZWM_170MConfig, ZWM_1BConfig
 ├── scripts/              # Training recipes, HF download, eval/ wrappers
-├── demos/                # Reviewer-facing demos (Gradio, inference, smoke test)
+├── demos/                # Public-facing demos (Gradio, inference, smoke test)
+├── assets/               # README figures
 ├── data/demo_videos/     # Bundled CC-BY clips for the inference demo
 ├── data/evals/           # Bundled iteration plans for benchmark evals
 ├── out/                  # Model checkpoints (downloaded or trained)
 ├── viz/                  # Inference and eval visualization outputs
 ├── requirements.txt      # Pinned dependencies
+├── setup.py              # Package install (pip install -e .)
 ├── SOFTWARE.md           # Software policy / version manifest
 └── LICENSE               # MIT
 ```
