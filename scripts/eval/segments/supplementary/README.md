@@ -52,7 +52,7 @@ Outputs go to
 `viz/eval/segments/spelke_bench_featurenn/<slug>_featurenn_layer{L}_{norm}_tau{T}/<key>.h5`.
 Each cell file stores **only `segment_pred`** — `image` and `segment_gt` are
 identical across every cell, so the graders read them back from the source
-`spelke_bench.h5` (via `source_loaders.py`) rather than duplicating them ~64× per
+`spelke_bench.h5` (via `zwm.eval.segments.feature_nn`) rather than duplicating them ~64× per
 image. This makes each file ~2% of an all-in-one copy (the RGB image was ~96%).
 
 ## Grade

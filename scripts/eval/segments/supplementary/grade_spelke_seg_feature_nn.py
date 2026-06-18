@@ -24,7 +24,7 @@ import numpy as np
 from zwm.eval.segments.segment import evaluate_AP_AR_single_image
 from zwm.eval.segments.grade_spelke_seg import _dataset_name_from_key, plot_segments_with_gt_overlay
 
-from source_loaders import load_image, load_segments  # sibling module (sys.path[0])
+from zwm.eval.segments.feature_nn import load_image, load_segments  # source-dataset loaders
 
 
 def main():

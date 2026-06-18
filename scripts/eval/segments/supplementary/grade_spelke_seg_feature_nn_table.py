@@ -22,7 +22,7 @@ import numpy as np
 
 from zwm.eval.segments.segment import evaluate_AP_AR_single_image
 
-from source_loaders import load_segments  # sibling module (sys.path[0]): source-dataset GT loader
+from zwm.eval.segments.feature_nn import load_segments  # source-dataset GT loader
 
 
 def grade_dir(d, src_h5, gt_cache):

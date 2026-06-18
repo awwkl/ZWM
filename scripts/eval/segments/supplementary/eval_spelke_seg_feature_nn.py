@@ -39,21 +39,20 @@ from __future__ import annotations
 
 import argparse
 import os
-import shutil
 
-import cv2
 import h5py
 import numpy as np
 import torch
 import torch.nn.functional as F
 from PIL import Image
-from scipy import ndimage
 
 from zwm.data.image_processing import patchify_image
 from zwm.data.sequence_construction import get_pos_idxs
 from zwm.zwm_predictor import ZWMPredictor
-
-from source_loaders import load_image, load_segments, load_centroids  # sibling module (sys.path[0])
+from zwm.eval.segments.feature_nn import (
+    load_image, load_segments, load_centroids,
+    featurenn_segment, has_predictions, write_result_h5,
+)
 
 
 def parse_args():
@@ -147,68 +146,9 @@ def _frame_to_patches(predictor, frame_np):
     return patchify_image(img, patch_size)
 
 
-# ------------------------------------------------------------
-# Feature-NN segmentation: seed patch -> cosine affinity -> tau -> connected
-# component containing the seed (the standard DINOv2 / V-JEPA2 point-seg rule, sans CRF).
-# ------------------------------------------------------------
-
-def featurenn_segment(feats, centroid, grid, res, tau):
-    """Cosine-NN segment for one seed centroid.
-
-    feats: [num_patches, n_embd] patch features for the image (num_patches = grid**2).
-    centroid: [x, y] seed point in `res`-pixel space.
-    Returns a binary mask [res, res] (uint8).
-    """
-    patch_px = res / grid
-    cx, cy = float(centroid[0]), float(centroid[1])
-    qcol = min(max(int(cx // patch_px), 0), grid - 1)
-    qrow = min(max(int(cy // patch_px), 0), grid - 1)
-
-    seed_feat = feats[qrow * grid + qcol]
-    cos = F.cosine_similarity(seed_feat.unsqueeze(0), feats, dim=-1)  # [num_patches]
-    mask_grid = (cos > tau).reshape(grid, grid).detach().cpu().numpy().astype(np.uint8)
-
-    # Connected component containing the seed (fall back to the largest CC). The
-    # seed's self-cosine is 1 > tau, so its patch is always set; the fallback is
-    # only reached if labeling is degenerate.
-    labeled, n_components = ndimage.label(mask_grid)
-    seed_component = labeled[qrow, qcol]
-    if seed_component == 0:
-        if n_components == 0:
-            return np.zeros((res, res), dtype=np.uint8)
-        sizes = [int((labeled == i).sum()) for i in range(1, n_components + 1)]
-        seed_component = int(np.argmax(sizes)) + 1
-    mask = (labeled == seed_component).astype(np.uint8)
-
-    # Upsample the coarse grid mask to image resolution (nearest, like the baseline).
-    return cv2.resize(mask, (res, res), interpolation=cv2.INTER_NEAREST)
-
-
-def _has_predictions(out_path):
-    """True if out_path exists and already holds predictions (resume-safe skip)."""
-    if not os.path.exists(out_path):
-        return False
-    try:
-        with h5py.File(out_path, 'r') as f:
-            return "segment_pred" in f.keys()
-    except OSError:
-        return False
-
-
-def _write_result_h5(out_path, preds):
-    """Write one per-image result h5 (segment_pred only) via /tmp then move.
-
-    image / segment_gt are NOT stored — they are identical across every (layer,
-    tau) cell and every model, so the graders read them from the source dataset
-    instead (see featurenn_common). This keeps each cell file ~2% of the
-    all-in-one size (the RGB image was ~96% of it).
-    """
-    tmp_path = os.path.join("/tmp/spelke_seg_featurenn",
-                            f"{os.path.basename(out_path)}.{np.random.randint(0, int(1e10))}.tmp")
-    os.makedirs(os.path.dirname(tmp_path), exist_ok=True)
-    with h5py.File(tmp_path, "w") as f:
-        f.create_dataset("segment_pred", data=preds, compression="gzip")
-    shutil.move(tmp_path, out_path)
+# The backbone-agnostic probe (featurenn_segment), source loaders, and lean h5 IO
+# (has_predictions / write_result_h5) are shared with the baseline probes — they live
+# in zwm.eval.segments.feature_nn. This file only adds ZWM's own feature extractor.
 
 
 def main():
@@ -246,7 +186,7 @@ def main():
         for img_key in img_names:
             # Which taus still need this image (resume-safe, per tau)?
             pending = [t for t in taus
-                       if not _has_predictions(os.path.join(out_dirs[t], f"{img_key}.h5"))]
+                       if not has_predictions(os.path.join(out_dirs[t], f"{img_key}.h5"))]
             if not pending:
                 print(f"[skip] {img_key} (all {len(taus)} taus done)")
                 continue
@@ -262,7 +202,7 @@ def main():
             print(f"[{img_key}] {segments.shape[0]} segments, {len(pending)} tau(s)")
             for tau in pending:
                 preds = np.stack([featurenn_segment(feats, c, grid, res, tau) for c in centroids])
-                _write_result_h5(os.path.join(out_dirs[tau], f"{img_key}.h5"), preds)
+                write_result_h5(os.path.join(out_dirs[tau], f"{img_key}.h5"), preds)
             print(f"[done] {img_key} -> tau {[f'{t:g}' for t in pending]}")
 
 
