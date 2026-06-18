@@ -105,6 +105,6 @@ tuned for a different L1-norm metric). This only affects OA/OF1, not the Pct hea
 ## Scope
 
 This covers **flow** and **depth** (the two correspondence tasks). The
-**segmentation** counterpart (group patches by thresholding cosine similarity to
-a seed patch on SpelkeBench) is a different matching rule and is not yet
-implemented here.
+**segmentation** counterpart — group patches by thresholding cosine similarity to
+a seed patch on SpelkeBench — uses a different matching rule and lives in
+`scripts/eval/segments/supplementary/`.
