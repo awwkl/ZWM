@@ -35,7 +35,7 @@ export CUDA_VISIBLE_DEVICES="${GPU:-0}"
 
 CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 ENCODING=in_context          # in_context = both frames in one forward (ZWM's native two-frame setting); or independent
-LAYERS=(12 0 4 8 16 20 -1)   # middle first (headline), then every 4 layers + final post-LayerNorm
+LAYERS=(${LAYERS:-12 0 4 8 16 20 -1})   # 170M default; 1B: LAYERS="24 0 8 16 32 40 -1" bash <script>
 START_IDX=0
 NUM_POINTS=328
 
