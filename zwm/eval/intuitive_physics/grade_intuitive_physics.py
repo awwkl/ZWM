@@ -175,9 +175,18 @@ def main():
             lpips_p_f3 = float(lpips_model(pred_d, f3_d).item())
             lpips_p_f2 = float(lpips_model(pred_d, f2_d).item())
 
+        # Whole-image MSE (no mask) — the fairest like-for-like region vs the
+        # V-JEPA2 baseline's whole-image cosine, since it privileges no segment.
+        # Background-inflated, so use for the binary closer-to-frame3 metric;
+        # the object-region (primary) graded stays the informative score.
+        d_tgt_whole = masked_mse(pred, gt['frame3'], None)
+        d_ctx_whole = masked_mse(pred, gt['frame2'], None)
+        whole_acc, whole_graded = region_scores(d_ctx_whole, d_tgt_whole)
+
         row = {
             'category': category, 'item_key': item_key, 'seed': seed,
             'lpips_correct': int(lpips_p_f3 < lpips_p_f2),
+            'whole_acc': whole_acc, 'whole_graded': whole_graded,
         }
         for r in REGIONS:
             d_tgt = masked_mse(pred, gt['frame3'], gt['f3_masks'][r])
@@ -197,7 +206,9 @@ def main():
     # Per-category aggregation (pandas .mean() skips NaN -> empty regions excluded).
     cols = [f'{r}_{m}' for r in REGIONS for m in ('acc', 'graded')]
     def agg(sub):
-        out = {'n': len(sub), 'lpips_acc': float(sub['lpips_correct'].mean())}
+        out = {'n': len(sub), 'lpips_acc': float(sub['lpips_correct'].mean()),
+               'whole_acc': float(sub['whole_acc'].mean()),
+               'whole_graded': float(sub['whole_graded'].mean())}
         for c in cols:
             out[c] = float(sub[c].mean())
         return out
@@ -212,7 +223,8 @@ def main():
     table = pd.DataFrame(table_rows)
 
     show = ['category', 'n', 'primary_acc', 'primary_graded',
-            'secondary_acc', 'secondary_graded', 'overall_acc', 'overall_graded', 'lpips_acc']
+            'secondary_acc', 'secondary_graded', 'overall_acc', 'overall_graded',
+            'whole_acc', 'whole_graded', 'lpips_acc']
     pd.set_option('display.width', 200)
     print('\n' + table[show].to_string(index=False, float_format=lambda x: f'{x:.4f}'))
 
