@@ -243,16 +243,10 @@ def plot_fig6D_layerwise(df, score_name, out_dir):
     print("saved Fig 6D ->", png)
 
 
-def plot_fig6C_layer_area(df, score_name, out_dir, model=FIG6C_MODEL,
-                          title="First layer to reach noise ceiling", fname=None):
-    """Fig 6C: first encoder layer to reach the noise ceiling per NSD ROI.
-
-    For each ROI, the bar is the depth of the earliest layer at the ceiling (else
-    the best layer). Hierarchical correspondence = depth rising from early (blue)
-    to mid/high (green) areas. Reproduces notebook cell 15. Returns the bar
-    values, or None if the model has no data.
+def _fig6C_bar_vals(df, model, score_name):
+    """Per-NSD-ROI Fig 6C bar value: fractional depth of the earliest layer to reach
+    the noise ceiling (else the best layer). None if the model has no data.
     """
-    os.makedirs(out_dir, exist_ok=True)
     if df[df["model"] == model].empty:
         return None
     bar_vals = []
@@ -268,6 +262,22 @@ def plot_fig6C_layer_area(df, score_name, out_dir, model=FIG6C_MODEL,
             tied = d[d[score_name] == d[score_name].max()]
             best = tied.loc[tied["layer_percentage"].idxmin()]
         bar_vals.append(float(best["layer_percentage"]))
+    return bar_vals
+
+
+def plot_fig6C_layer_area(df, score_name, out_dir, model=FIG6C_MODEL,
+                          title="First layer to reach noise ceiling", fname=None):
+    """Fig 6C: first encoder layer to reach the noise ceiling per NSD ROI.
+
+    For each ROI, the bar is the depth of the earliest layer at the ceiling (else
+    the best layer). Hierarchical correspondence = depth rising from early (blue)
+    to mid/high (green) areas. Reproduces notebook cell 15. Returns the bar
+    values, or None if the model has no data.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    bar_vals = _fig6C_bar_vals(df, model, score_name)
+    if bar_vals is None:
+        return None
 
     y = np.arange(len(NSD_BENCHMARKS))
     colors = ["tab:green" if (("High" in b) or ("Mid" in b)) else "tab:blue"
@@ -290,6 +300,68 @@ def plot_fig6C_layer_area(df, score_name, out_dir, model=FIG6C_MODEL,
     plt.close(fig)
     print("saved Fig 6C ->", png)
     return bar_vals
+
+
+# Panel layout for the all-models Fig 6C figure: columns are 170M / 1B / V-JEPA2,
+# the top row is the standard-data models and the bottom row the developmental
+# (BabyView-trained) counterparts, so each column pairs an architecture with its
+# baby-diet version.
+FIG6C_PANEL_LAYOUT = [
+    ["cwm_170m_one_image_ln_1",          "cwm_1b_one_image_ln_1",          "vjepa2_large_16"],
+    ["cwm_170m_babyview_one_image_ln_1", "cwm_1b_babyview_one_image_ln_1", "vjepa2_large_16_babyview"],
+]
+
+
+def plot_fig6C_all_models_panel(df, score_name, out_dir, layout=None):
+    """Fig 6C for all models in one figure: a grid of layer-area panels, one per
+    model (Supplementary, rebuttal R2.8).
+
+    Each panel reuses the main-text Fig 6C readout (`_fig6C_bar_vals`) and matches its
+    aesthetic (V1 at top, blue early areas -> green mid/high, identical x-axis): per
+    NSD ROI, the fractional depth of the earliest layer to reach the noise ceiling. A
+    blue-to-green staircase indicates hierarchical layer-area correspondence; the grid
+    lets the reader compare that correspondence across BabyZWM, the ZWM variants, and
+    the V-JEPA2 baselines side by side.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    layout = layout or FIG6C_PANEL_LAYOUT
+    nrows = len(layout)
+    ncols = max(len(r) for r in layout)
+    y = np.arange(len(NSD_BENCHMARKS))
+    colors = ["tab:green" if (("High" in b) or ("Mid" in b)) else "tab:blue"
+              for b in NSD_BENCHMARKS]
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.0 * ncols, 3.6 * nrows),
+                             sharex=True, sharey=True)
+    axes = np.atleast_2d(axes)
+    for r, row in enumerate(layout):
+        for c in range(ncols):
+            ax = axes[r, c]
+            model = row[c] if c < len(row) else None
+            bar_vals = None if model is None else _fig6C_bar_vals(df, model, score_name)
+            if bar_vals is None:
+                ax.set_visible(False)
+                continue
+            ax.barh(y, np.nan_to_num(bar_vals, nan=0.0), color=colors)
+            ax.set_xlim(0, 1.0)
+            ax.set_xticks([0, 0.5, 1.0])
+            ax.set_yticks(y)
+            ax.set_yticklabels([BENCHMARK_NAME.get(b, b) for b in NSD_BENCHMARKS])
+            ax.set_title(MODEL_STYLE.get(model, {"name": model})["name"], fontsize=11)
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+    axes[0, 0].invert_yaxis()                              # invert once (shared y): V1 on top
+    for ax in axes[-1, :]:                                 # x label on bottom row only
+        if ax.get_visible():
+            ax.set_xlabel("Layer Percentage (0 = first, 1 = last layer)")
+
+    fig.suptitle("First layer to reach noise ceiling, per visual area (NSD)", fontsize=13)
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    png = os.path.join(out_dir, "fig6C_allmodels_panel.png")
+    fig.savefig(png, dpi=200, bbox_inches="tight")
+    fig.savefig(png.replace(".png", ".pdf"), bbox_inches="tight")
+    plt.close(fig)
+    print("saved Fig 6C (all-models panel) ->", png)
 
 
 # Baselines whose converged (best-layer) predictivity is shown as endpoint markers
@@ -602,6 +674,9 @@ def main():
         )
         if ok is None:
             print("  (skipped 6C, no data):", model)
+
+    # --- 6C all models in one multi-panel figure (Supplementary, R2.8) ---
+    plot_fig6C_all_models_panel(df, args.score, c_all)
 
     # --- 6B (developmental) only exists for the BabyZWM 170M checkpoint series ---
     # No other model in the comparison set has intermediate training checkpoints

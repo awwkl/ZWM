@@ -31,9 +31,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." || exit 1
 # cuda:0, so --device cuda lands on it. Override per node: GPU=3 bash <script>.
 export CUDA_VISIBLE_DEVICES="${GPU:-0}"
 
-CKPT=awwkl/zwm-bvd-1b/model.pt
+# Path relative to out/. Override per run: CKPT=<path> bash <script>.
+CKPT="${CKPT:-awwkl/zwm-bvd-170m/model.pt}"
 ENCODING=in_context          # in_context = both frames in one forward (ZWM's native two-frame setting); or independent
-LAYERS=(12 0 4 8 16 20 -1)   # middle first (headline), then every 4 layers + final post-LayerNorm
+# Middle layer first (headline), then every 4 layers + final post-LayerNorm.
+# 170M (24-layer) default; for the 1B (48-layer): LAYERS="24 0 8 16 32 40 -1" bash <script>.
+LAYERS=(${LAYERS:-12 0 4 8 16 20 -1})
 START_IDX=0
 NUM_POINTS=38881
 
