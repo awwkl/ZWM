@@ -1,8 +1,8 @@
 """
 Build a two-panel qualitative figure from the Gradio captures.
 
-    (A) Collision into a light object     6 examples in one row
-    (B) Collision into a heavy object     6 examples in one row
+    (A) Collision into a lighter object     6 examples in one row
+    (B) Collision into a heavier object    6 examples in one row
 
 Each example is one column: the annotated input, with the model's
 prediction directly beneath it.
@@ -39,8 +39,8 @@ except ImportError:  # invoked as `python -m demos.make_figure`
     from demos.make_panels import _font, find_runs, DEFAULT_SAVE_DIR
 
 # Panel order is the figure's panel lettering: A first, then B.
-PANELS = [("light", "Collision into a light object"),
-          ("heavy", "Collision into a heavy object")]
+PANELS = [("light", "Collision into a lighter object"),
+          ("heavy", "Collision into a heavier object")]
 
 BG = (255, 255, 255)
 FG = (38, 38, 38)        # seaborn's ".15" text grey
