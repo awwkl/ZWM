@@ -27,6 +27,7 @@ env/
 tmp/
 personal_notes/
 personal_scripts/
+mass_experiments/
 viz/
 .gradio/
 wandb/

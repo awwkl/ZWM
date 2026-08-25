@@ -11,7 +11,9 @@ under ./out/.
 """
 
 import argparse
+import datetime
 import glob
+import json
 import os
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,7 +48,32 @@ def parse_args():
     parser.add_argument("--examples_dir", type=str, default="demos/assets/examples",
                         help="Directory of sample images displayed in the gallery")
     parser.add_argument("--share", default=True, help="Create a public shareable link")
+    parser.add_argument("--models", type=str, nargs="+", default=None,
+                        help="Checkpoints offered in the model dropdown. "
+                             "Default: every out/*/*/model.pt found, plus --model_name.")
+    parser.add_argument("--save_dir", type=str,
+                        default=os.path.join(_REPO_ROOT, "demos", "outputs"),
+                        help="Where the Save button writes captures. "
+                             'Pass --save_dir "" to hide the button entirely.')
     return parser.parse_args()
+
+
+_PREDICTORS = {}
+
+
+def get_predictor(model_name: str) -> ZWMPredictor:
+    """Load a checkpoint once and reuse it across model switches."""
+    if model_name not in _PREDICTORS:
+        print(f"Loading ZWM predictor: {model_name}")
+        _PREDICTORS[model_name] = ZWMPredictor(model_name)
+    return _PREDICTORS[model_name]
+
+
+def discover_checkpoints():
+    """Every model.pt under ./out/, as the <org>/<repo>/model.pt name ZWMPredictor wants."""
+    out_root = os.path.join(_REPO_ROOT, "out")
+    found = glob.glob(os.path.join(out_root, "*", "*", "model.pt"))
+    return sorted(os.path.relpath(f, out_root) for f in found)
 
 
 def _set_seed(seed: int):
@@ -60,8 +87,12 @@ def resize_to_square(img, size=DISPLAY_RES):
     return np.array(transforms.Resize((size, size))(img))
 
 
-def build_demo(predictor: ZWMPredictor, examples_dir: str):
+def build_demo(predictor: ZWMPredictor, examples_dir: str,
+               save_dir: str = "", model_name: str = "", model_choices=None):
+    model_choices = model_choices or [model_name]
     patch_size_move_mult = 2
+    # All released ZWM checkpoints share resolution=256 / patch_size=8, so the
+    # click-to-patch geometry below is the same for every entry in the dropdown.
     model_patch_px = predictor.model.config.patch_size * patch_size_move_mult
     patch_viz_px = int(round(model_patch_px * DISPLAY_RES / predictor.model.config.resolution))
     rect_thickness = 2
@@ -92,6 +123,11 @@ def build_demo(predictor: ZWMPredictor, examples_dir: str):
 
             with gr.Column():
                 output_image = gr.Image(type="numpy", label="Hypothetical Prediction")
+                model_dropdown = gr.Dropdown(
+                    choices=model_choices, value=model_name, label="Model",
+                    info="First use of a checkpoint loads it (a few seconds "
+                         "for 170M, longer for 1B); after that switching is instant.")
+                model_status = gr.Markdown("")
                 run_model_button = gr.Button("Run ZWM")
                 seed_text = gr.Textbox(label="Seed", value="1110")
 
@@ -154,7 +190,20 @@ def build_demo(predictor: ZWMPredictor, examples_dir: str):
 
         clear_button.click(clear_all_points, [original_image, selected_points], [input_image])
 
-        def run_model_on_points(points, original_image_square, seed_text):
+        def load_selected(name):
+            if not name:
+                return "No model selected."
+            already = name in _PREDICTORS
+            p = get_predictor(name)
+            n_params = sum(x.numel() for x in p.model.parameters()) / 1e6
+            verb = "Ready (cached)" if already else "Loaded"
+            return f"{verb}: `{name}` — {n_params:.0f}M params, "\
+                   f"{p.model.config.resolution}px / patch {p.model.config.patch_size}."
+
+        model_dropdown.change(load_selected, [model_dropdown], [model_status])
+
+        def run_model_on_points(points, original_image_square, seed_text, name):
+            predictor = get_predictor(name)
             model_res = predictor.model.config.resolution
             factor = model_res / DISPLAY_RES
             move_points = np.array(points).reshape(-1, 4) * factor
@@ -172,9 +221,65 @@ def build_demo(predictor: ZWMPredictor, examples_dir: str):
 
         run_model_button.click(
             run_model_on_points,
-            [selected_points, original_image, seed_text],
+            [selected_points, original_image, seed_text, model_dropdown],
             [output_image],
         )
+
+        if save_dir:
+            with gr.Row():
+                save_name = gr.Textbox(label="Save name (optional)", value="", scale=3,
+                                       placeholder="e.g. pulley_gemini_2_drag_heavy_down")
+                save_button = gr.Button("Save inputs + output", scale=1)
+            save_status = gr.Markdown("")
+
+            def save_capture(annotated_img, clean_img, pred_img, points, seed, name,
+                             used_model):
+                if clean_img is None:
+                    return "**Nothing to save** — load or upload an image first."
+                os.makedirs(save_dir, exist_ok=True)
+                stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                slug = "".join(c if (c.isalnum() or c in "-_") else "_" for c in (name or "")).strip("_")
+                stem = f"{stamp}_{slug}" if slug else stamp
+
+                written = []
+                Image.fromarray(clean_img).save(os.path.join(save_dir, f"{stem}_input.png"))
+                written.append(f"{stem}_input.png")
+                if annotated_img is not None:
+                    Image.fromarray(annotated_img).save(
+                        os.path.join(save_dir, f"{stem}_input_annotated.png"))
+                    written.append(f"{stem}_input_annotated.png")
+                if pred_img is not None:
+                    Image.fromarray(pred_img).save(os.path.join(save_dir, f"{stem}_pred.png"))
+                    written.append(f"{stem}_pred.png")
+                else:
+                    written.append("(no prediction yet — output not saved)")
+
+                model_res = predictor.model.config.resolution
+                pts = list(points) if points else []
+                meta = {
+                    "model_name": used_model,
+                    "seed": seed,
+                    "display_res": DISPLAY_RES,
+                    "model_resolution": model_res,
+                    "patch_size": predictor.model.config.patch_size,
+                    "patch_size_move_mult": patch_size_move_mult,
+                    "points_display_res": pts,
+                    "move_points_model_res": (
+                        (np.array(pts).reshape(-1, 4) * (model_res / DISPLAY_RES)).tolist()
+                        if len(pts) >= 2 else []
+                    ),
+                }
+                with open(os.path.join(save_dir, f"{stem}_meta.json"), "w") as f:
+                    json.dump(meta, f, indent=2)
+                written.append(f"{stem}_meta.json")
+                return f"Saved to `{save_dir}`:\n\n" + "\n".join(f"- `{w}`" for w in written)
+
+            save_button.click(
+                save_capture,
+                [input_image, original_image, output_image, selected_points, seed_text, save_name,
+                 model_dropdown],
+                [save_status],
+            )
 
         gallery = gr.Gallery(value=[], columns=5, allow_preview=False,
                              label="Click an example to load it")
@@ -205,9 +310,13 @@ def build_demo(predictor: ZWMPredictor, examples_dir: str):
 
 def main():
     args = parse_args()
-    print(f"Loading ZWM predictor: {args.model_name}")
-    predictor = ZWMPredictor(args.model_name)
-    demo = build_demo(predictor, args.examples_dir)
+    choices = args.models if args.models else discover_checkpoints()
+    if args.model_name not in choices:
+        choices = [args.model_name] + choices
+    print(f"Model dropdown: {choices}")
+    predictor = get_predictor(args.model_name)
+    demo = build_demo(predictor, args.examples_dir, args.save_dir, args.model_name,
+                      model_choices=choices)
     demo.queue().launch(inbrowser=True, share=args.share)
 
 
