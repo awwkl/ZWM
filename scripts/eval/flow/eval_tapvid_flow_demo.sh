@@ -10,7 +10,13 @@
 # This is a smoketest of the eval pipeline, not a usable benchmark number.
 # For the full 38881-point benchmark, use eval_tapvid_flow.sh.
 #
-# Prereq (one-time): extract frames from the TapVID-DAVIS pickle
+# Prereq (one-time): download the prebuilt dataset (frames + pickle) from
+# HuggingFace into data/evals/flow/. ~3.7 GB.
+#
+#   huggingface-cli download awwkl/zwm-tapvid-davis-eval \
+#       --repo-type dataset --local-dir data/evals/flow/
+#
+# Or build it from the official TapVID-DAVIS pickle (see README.md):
 #   python scripts/eval/flow/extract_tapvid_davis_pkl.py \
 #       --pkl_path /path/to/tapvid_davis.pkl \
 #       --out_dir data/evals/flow/tapvid_davis_first/frames/

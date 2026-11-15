@@ -214,7 +214,17 @@ The [zwm/eval/](zwm/eval/) package holds the benchmark suite. Each task lives un
 
 Predicts where a query point moves between two frames by *perturbing* the patch around the query point in frame0, predicting frame1 with and without the perturbation, and locating the perturbation's "shadow" in the RGB-prediction difference map. Iterative zoom refines the prediction. End-Point Error (EPE) against TAP-Vid-DAVIS ground-truth tracks is the metric.
 
-**One-time data prep.** The bundled [data/evals/flow/tapvid_davis_first/dataset.json](data/evals/flow/tapvid_davis_first/dataset.json) is the iteration plan (~38 K query/target point pairs over 30 DAVIS videos). Frames and ground-truth tracks live in the official TAP-Vid-DAVIS pickle (CC-BY 4.0; ~2.4 GB).
+**One-time data prep.** Download the prebuilt dataset from HuggingFace into `data/evals/flow/` (~3.7 GB):
+
+```bash
+huggingface-cli download awwkl/zwm-tapvid-davis-eval --repo-type dataset --local-dir data/evals/flow/
+```
+
+Run `huggingface-cli login` first: anonymous downloads of its ~2,000 files can hit HuggingFace's rate limit.
+
+This fills `data/evals/flow/tapvid_davis_first/` with the bundled [dataset.json](data/evals/flow/tapvid_davis_first/dataset.json) iteration plan (~38 K query/target point pairs over 30 DAVIS videos), the official TAP-Vid-DAVIS pickle (CC-BY 4.0; ~2.4 GB; the ground-truth tracks the grader reads) and the per-frame PNGs extracted from it at `frames/<video>/video/<idx>.png` (~1.2 GB). The pickle and the `frames/` directory are both gitignored.
+
+To build the same files from the official source instead:
 
 1. Download the pickle from the [TAP-Vid project page](https://storage.googleapis.com/dm-tapnet/index.html) — direct link: <https://storage.googleapis.com/dm-tapnet/tapvid_davis.zip>.
 2. Unzip and place `tapvid_davis.pkl` at `data/evals/flow/tapvid_davis_first/tapvid_davis.pkl` (the path the eval and grader scripts expect).
@@ -225,8 +235,6 @@ Predicts where a query point moves between two frames by *perturbing* the patch 
        --pkl_path data/evals/flow/tapvid_davis_first/tapvid_davis.pkl \
        --out_dir data/evals/flow/tapvid_davis_first/frames/
    ```
-
-   Writes ~1.2 GB of PNGs at `<video>/video/<idx>.png`. The pickle and the `frames/` directory are both gitignored.
 
 **Run the eval.** Two wrapper scripts — pick one. Both have all settings hardcoded near the top of the file; edit those values rather than passing CLI flags.
 
